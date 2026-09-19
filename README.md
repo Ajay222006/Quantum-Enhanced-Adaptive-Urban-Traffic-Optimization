@@ -432,3 +432,5 @@ python experiments/run_classical_optimizer.py --scenario normal --emergency-prio
 
 Milestone 6: QUBO →
 Milestone 7: classical optimizer → Milestone 8: QAOA → Milestone 12: dashboard.
+#   q u a n t e x a _ p r o j e c t  
+ 
