@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<additional>
-    <inductionLoop id="det_w_in" lane="west_in_0" pos="30" freq="30" file="det_w_in.xml"/>
-    <inductionLoop id="det_e_in" lane="east_in_0" pos="30" freq="30" file="det_e_in.xml"/>
-    <inductionLoop id="det_n_in" lane="north_in_0" pos="30" freq="30" file="det_n_in.xml"/>
-    <inductionLoop id="det_s_in" lane="south_in_0" pos="30" freq="30" file="det_s_in.xml"/>
-</additional>
