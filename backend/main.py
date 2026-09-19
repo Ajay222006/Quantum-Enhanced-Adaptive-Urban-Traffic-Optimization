@@ -8,6 +8,7 @@ Run with: uvicorn backend.main:app --reload
 from __future__ import annotations
 
 import asyncio
+import copy
 import os
 import threading
 import time
@@ -46,6 +47,10 @@ class RuntimeSnapshot:
     state: dict[str, Any] | None = None
     controller: str = "hybrid_qaoa"
     optimization: dict[str, Any] | None = None
+    signals: dict[str, Any] = field(default_factory=dict)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    events: list[dict[str, Any]] = field(default_factory=list)
+    prediction: dict[str, Any] = field(default_factory=dict)
     updated_at: float | None = None
 
 
@@ -77,6 +82,8 @@ class SumoRuntime:
                         "queue": sum(record.get("queue", 0) for record in all_records),
                         "density": round(sum(record.get("density", 0.0) for record in all_records) / max(len(all_records), 1), 3),
                         "average_speed": round(sum(record.get("avg_speed", 0.0) for record in all_records) / max(len(all_records), 1), 2),
+                        "signal": current.signals.get(intersection_id, {}),
+                        "optimized_timing": (current.optimization or {}).get("solution", {}),
                     })
             return {
                 "status": current.status,
@@ -84,6 +91,10 @@ class SumoRuntime:
                 "simulation_time": current.simulation_time,
                 "controller": current.controller,
                 "optimization": current.optimization,
+                "signals": current.signals,
+                "metrics": current.metrics,
+                "events": current.events,
+                "prediction": current.prediction,
                 "updated_at": current.updated_at,
                 "intersections": intersections,
                 "source": "SUMO TraCI" if state is not None else None,
@@ -114,47 +125,101 @@ class SumoRuntime:
             self.command_queue.append(("phase", {"tls_id": tls_id, "phase": phase}))
 
     def _run(self, gui: bool) -> None:
-        connector = None
-        try:
-            connector = SumoTraCIConnector(config_path=str(DEFAULT_SUMO_CONFIG), gui=gui)
-            connector.start()
-            optimizer = RealtimeSUMOOptimizer(optimization_interval=self.optimization_interval)
-            with self.lock:
-                self.connector = connector
-                self.optimizer = optimizer
-                self.snapshot.status = "CONNECTED"
-                self.snapshot.error = None
-
-            while not self.stop_event.is_set():
-                now = connector.get_simulation_time()
-                if now is None:
-                    break
-                if now >= self.duration:
-                    break
-                self._apply_commands()
-                optimization = optimizer.step(now)
-                state = optimizer.estimator.update()
+        while not self.stop_event.is_set():
+            connector = None
+            completed = False
+            try:
                 with self.lock:
-                    self.snapshot.simulation_time = now
-                    self.snapshot.state = state
-                    self.snapshot.optimization = optimization
-                    self.snapshot.updated_at = time.time()
-                connector.step()
+                    self.snapshot.status = "CONNECTING"
+                    self.snapshot.error = None
+                connector = SumoTraCIConnector(config_path=str(DEFAULT_SUMO_CONFIG), gui=gui)
+                connector.start()
+                optimizer = RealtimeSUMOOptimizer(optimization_interval=self.optimization_interval)
+                with self.lock:
+                    self.connector = connector
+                    self.optimizer = optimizer
+                    self.snapshot.status = "CONNECTED"
 
-            with self.lock:
-                if self.snapshot.status != "ERROR":
-                    self.snapshot.status = "DISCONNECTED"
-        except Exception as exc:
-            with self.lock:
-                self.snapshot.status = "ERROR"
-                self.snapshot.error = f"{type(exc).__name__}: {exc}"
-                self.snapshot.updated_at = time.time()
-        finally:
-            if connector is not None:
-                connector.stop()
-            with self.lock:
-                self.connector = None
-                self.optimizer = None
+                while not self.stop_event.is_set():
+                    now_before = connector.get_simulation_time()
+                    if now_before is None or now_before >= self.duration:
+                        completed = True
+                        break
+                    self._apply_commands()
+                    connector.step()
+                    now = connector.get_simulation_time()
+                    if now is None:
+                        raise RuntimeError("SUMO TraCI connection closed during simulation")
+                    state = optimizer.estimator.update()
+                    vehicle_metrics = connector.get_vehicle_metrics()
+                    signal_info = connector.get_signal_info(optimizer.tls_id)
+                    detected = optimizer.event_detector.check(now, state)
+                    optimizer.event_log.extend(event.message for event in detected)
+                    optimization = None
+                    if detected or now >= optimizer.next_optimization:
+                        trigger = "event" if detected else "scheduled"
+                        optimization = optimizer.optimize_once(
+                            now, current=copy.deepcopy(state), trigger=trigger
+                        )
+                        optimizer.next_optimization = now + optimizer.optimization_interval
+                    with self.lock:
+                        self.snapshot.simulation_time = now
+                        self.snapshot.state = state
+                        previous_metrics = self.snapshot.metrics
+                        flow_per_minute = sum(
+                            float(record.get("flow", 0.0))
+                            for directions in state.values()
+                            for record in directions.values()
+                        )
+                        self.snapshot.metrics = {
+                            "active_vehicles": vehicle_metrics["active_vehicles"],
+                            "queue_vehicles": sum(
+                                int(record.get("queue", 0))
+                                for directions in state.values()
+                                for record in directions.values()
+                            ),
+                            "average_wait_seconds": round(
+                                vehicle_metrics["total_waiting_seconds"] / max(vehicle_metrics["active_vehicles"], 1), 2
+                            ),
+                            "average_speed_mps": vehicle_metrics["average_speed_mps"],
+                            "throughput_vehicles_per_hour": round(flow_per_minute * 60.0, 2),
+                            "estimated_fuel_litres": round(
+                                float(previous_metrics.get("estimated_fuel_litres", 0.0)) + vehicle_metrics["fuel_litres_per_second"], 4
+                            ),
+                            "estimated_co2_kg": round(
+                                float(previous_metrics.get("estimated_co2_kg", 0.0)) + vehicle_metrics["co2_kg_per_second"], 4
+                            ),
+                            "environment_label": "Simulation-based estimates",
+                        }
+                        self.snapshot.signals = {optimizer.tls_id: signal_info}
+                        self.snapshot.events = [
+                            {"time": event.time, "kind": event.kind, "location": f"{event.intersection}/{event.direction}", "message": event.message}
+                            for event in optimizer.event_detector.events[-20:]
+                        ]
+                        self.snapshot.prediction = (optimization or {}).get("predicted_state", {})
+                        if optimization is not None:
+                            self.snapshot.optimization = optimization
+                        self.snapshot.updated_at = time.time()
+
+                with self.lock:
+                    if completed:
+                        self.snapshot.status = "COMPLETED"
+                    elif self.stop_event.is_set():
+                        self.snapshot.status = "STOPPED"
+            except Exception as exc:
+                with self.lock:
+                    self.snapshot.status = "RECONNECTING"
+                    self.snapshot.error = f"{type(exc).__name__}: {exc}"
+                    self.snapshot.updated_at = time.time()
+            finally:
+                if connector is not None:
+                    connector.stop()
+                with self.lock:
+                    self.connector = None
+                    self.optimizer = None
+            if completed or self.stop_event.is_set():
+                break
+            self.stop_event.wait(2.0)
 
     def _apply_commands(self) -> None:
         with self.lock:
@@ -191,9 +256,9 @@ def status() -> dict[str, Any]:
     return {
         "sumo": data["status"],
         "traci": data["status"],
-        "prediction": "INACTIVE",
-        "classical_optimizer": "READY" if data["status"] == "CONNECTED" else "OFFLINE",
-        "qaoa": "READY" if data["status"] == "CONNECTED" else "OFFLINE",
+        "prediction": "ACTIVE" if data.get("prediction") else "READY",
+        "classical_optimizer": "READY" if data["status"] in {"CONNECTED", "CONNECTING", "RECONNECTING"} else "OFFLINE",
+        "qaoa": "READY" if data["status"] in {"CONNECTED", "CONNECTING", "RECONNECTING"} else "OFFLINE",
         "emergency": "NORMAL",
         "incident_detection": "ACTIVE" if data["status"] == "CONNECTED" else "INACTIVE",
         "error": data["error"],

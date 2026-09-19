@@ -108,6 +108,49 @@ class SumoTraCIConnector:
             return None
         return float(traci.simulation.getTime())
 
+    def get_signal_info(self, tls_id='C'):
+        if not self.connected:
+            return {}
+        phase = int(traci.trafficlight.getPhase(tls_id))
+        state = traci.trafficlight.getRedYellowGreenState(tls_id)
+        duration = float(traci.trafficlight.getPhaseDuration(tls_id))
+        remaining = max(0.0, float(traci.trafficlight.getNextSwitch(tls_id)) - float(traci.simulation.getTime()))
+        labels = {0: 'NS GREEN', 1: 'NS YELLOW', 2: 'EW GREEN', 3: 'EW YELLOW'}
+        return {
+            'phase': phase,
+            'state': state,
+            'label': labels.get(phase, f'PHASE {phase}'),
+            'current_green_seconds': duration if phase in (0, 2) else 0.0,
+            'remaining_seconds': round(remaining, 1),
+        }
+
+    def get_vehicle_metrics(self):
+        if not self.connected:
+            return {'active_vehicles': 0, 'total_waiting_seconds': 0.0,
+                    'average_speed_mps': 0.0, 'fuel_litres_per_second': 0.0,
+                    'co2_kg_per_second': 0.0}
+        vehicle_ids = traci.vehicle.getIDList()
+        total_waiting = 0.0
+        total_speed = 0.0
+        fuel_litres_per_second = 0.0
+        co2_kg_per_second = 0.0
+        for vehicle_id in vehicle_ids:
+            try:
+                total_waiting += float(traci.vehicle.getWaitingTime(vehicle_id))
+                total_speed += float(traci.vehicle.getSpeed(vehicle_id))
+                fuel_litres_per_second += float(traci.vehicle.getFuelConsumption(vehicle_id)) / 740000.0
+                co2_kg_per_second += float(traci.vehicle.getCO2Emission(vehicle_id)) / 1_000_000.0
+            except (AttributeError, TypeError, ValueError):
+                continue
+        count = len(vehicle_ids)
+        return {
+            'active_vehicles': count,
+            'total_waiting_seconds': round(total_waiting, 2),
+            'average_speed_mps': round(total_speed / count, 2) if count else 0.0,
+            'fuel_litres_per_second': max(0.0, fuel_litres_per_second),
+            'co2_kg_per_second': max(0.0, co2_kg_per_second),
+        }
+
     def set_signal_phase(self, tls_id='C', phase_index=0):
         if not self.connected:
             return
