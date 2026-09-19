@@ -5,3 +5,46 @@ document.querySelectorAll('[data-menu]').forEach((button) => button.addEventList
 document.querySelectorAll('[data-toast]').forEach((button) => button.addEventListener('click', () => { const toast = document.querySelector('[data-toast-box]'); toast.textContent = button.dataset.toast; toast.classList.add('show'); window.setTimeout(() => toast.classList.remove('show'), 2400); }));
 const additionalPages = [{ group: 'Analyze', items: [['metrics.html', 'metrics', '◉', 'Traffic metrics'], ['prediction.html', 'prediction', '⌁', 'Traffic prediction'], ['what-if.html', 'whatif', '◇', 'What-if analysis'], ['environment.html', 'environment', '◒', 'Environmental impact'], ['reports.html', 'reports', '▤', 'Reports']] }, { group: 'System', items: [['signal-control.html', 'signals', '◫', 'Signal control'], ['alerts.html', 'alerts', '!', 'Alerts'], ['about.html', 'about', 'i', 'About system']] }];
 document.querySelectorAll('[data-sidebar] .nav-group').forEach((group) => { additionalPages.forEach((section) => { const label = document.createElement('span'); label.className = 'nav-label'; label.textContent = section.group; group.appendChild(label); section.items.forEach(([href, route, icon, text]) => { const link = document.createElement('a'); link.href = href; link.dataset.route = route; link.innerHTML = `${icon} <span>${text}</span>`; if (document.body.dataset.page === route) link.classList.add('active'); group.appendChild(link); }); }); });
+
+const liveApi = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+const liveValue = (value, suffix = '') => value === null || value === undefined ? '--' : `${value}${suffix}`;
+const setLiveText = (label, value) => {
+	document.querySelectorAll('.metric-card p').forEach((node) => {
+		if (node.textContent.trim().toLowerCase() === label.toLowerCase()) {
+			const strong = node.parentElement.querySelector('strong');
+			if (strong) strong.textContent = value;
+		}
+	});
+};
+const renderLiveSnapshot = (snapshot) => {
+	const connected = snapshot.status === 'CONNECTED';
+	document.querySelectorAll('.live-indicator').forEach((node) => {
+		node.innerHTML = `<i></i> ${connected ? 'SUMO live' : snapshot.status}`;
+	});
+	const intersections = snapshot.intersections || [];
+	const queue = intersections.reduce((sum, item) => sum + (item.queue || 0), 0);
+	const vehicles = intersections.reduce((sum, item) => sum + (item.vehicle_count || 0), 0);
+	const speedValues = intersections.map((item) => item.average_speed || 0);
+	const averageSpeed = speedValues.length ? (speedValues.reduce((sum, value) => sum + value, 0) / speedValues.length).toFixed(1) : null;
+	setLiveText('Active queue length', connected ? liveValue(queue, ' veh') : '--');
+	setLiveText('Average wait time', connected ? liveValue(snapshot.optimization?.current_state?.wait, ' sec') : '--');
+	setLiveText('Traffic throughput', connected ? liveValue(vehicles, ' veh') : '--');
+	setLiveText('CO₂ emissions', '--');
+	document.querySelectorAll('.lede').forEach((node) => {
+		if (node.textContent.includes('Adaptive signals') || node.textContent.includes('Inspect density')) {
+			node.textContent = connected ? `Live SUMO state at ${liveValue(snapshot.simulation_time, 's')}. ${intersections.length} intersections reporting.` : 'SUMO is disconnected. Start the backend simulation to view live traffic.';
+		}
+	});
+	document.querySelectorAll('.map-node').forEach((node, index) => {
+		const item = intersections[index];
+		if (item) node.innerHTML = `${item.id}<small>${Math.round((item.density || 0) * 100)}%</small>`;
+		else node.innerHTML = `--<small>--</small>`;
+	});
+	document.querySelectorAll('.clock').forEach((node) => { node.textContent = connected ? `SUMO ${liveValue(snapshot.simulation_time, 's')}` : 'SUMO disconnected'; });
+};
+const connectLiveTraffic = () => {
+	const poll = () => fetch(`${liveApi}/api/snapshot`).then((response) => response.json()).then(renderLiveSnapshot).catch(() => renderLiveSnapshot({ status: 'DISCONNECTED', intersections: [] }));
+	poll();
+	window.setInterval(poll, 1000);
+};
+connectLiveTraffic();

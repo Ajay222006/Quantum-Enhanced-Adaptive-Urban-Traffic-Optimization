@@ -109,6 +109,29 @@ sumo --version
 python -c "import numpy, traci, xgboost, sklearn, joblib; print('Python dependencies OK')"
 ```
 
+## Live FastAPI and WebSocket service
+
+The live application backend is `backend/main.py`. It owns the SUMO/TraCI
+worker and exposes only SUMO-backed snapshots to the frontend:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m uvicorn backend.main:app --reload
+```
+
+Useful endpoints:
+
+- `GET /api/health` and `GET /api/status` report SUMO/TraCI/module status.
+- `POST /api/simulation/start` starts SUMO with JSON such as `{"gui": false}`.
+- `POST /api/simulation/stop` requests a clean worker shutdown.
+- `GET /api/snapshot` returns the latest live traffic state.
+- `POST /api/signals/{tls_id}/phase` queues a TraCI signal-phase command.
+- `WS /ws/live` streams snapshots once per second.
+
+Open the existing frontend pages from a local static server after starting the
+backend. The frontend shows `--` and `SUMO disconnected` until a real TraCI
+session is running; it does not substitute demo traffic values.
+
 Qiskit is optional. The current QAOA implementation uses the NumPy statevector
 simulator and does not require Qiskit. To install Qiskit Aer for a future
 backend, run:

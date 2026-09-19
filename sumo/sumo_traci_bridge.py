@@ -103,6 +103,11 @@ class SumoTraCIConnector:
             return {}
         return traci.trafficlight.getPhase(tls_id)
 
+    def get_simulation_time(self):
+        if not self.connected:
+            return None
+        return float(traci.simulation.getTime())
+
     def set_signal_phase(self, tls_id='C', phase_index=0):
         if not self.connected:
             return
