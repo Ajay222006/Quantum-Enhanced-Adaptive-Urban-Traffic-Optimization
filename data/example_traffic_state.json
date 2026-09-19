@@ -1,0 +1,22 @@
+{
+  "NS": {
+    "queue": 35,
+    "density": 0.72,
+    "waiting": 120,
+    "flow": 51,
+    "capacity": 100,
+    "emergency_delay": 18,
+    "fuel": 2.0,
+    "co2": 5.0
+  },
+  "EW": {
+    "queue": 12,
+    "density": 0.30,
+    "waiting": 45,
+    "flow": 35,
+    "capacity": 100,
+    "emergency_delay": 0,
+    "fuel": 1.5,
+    "co2": 3.8
+  }
+}

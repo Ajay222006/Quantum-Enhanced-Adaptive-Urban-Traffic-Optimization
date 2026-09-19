@@ -183,6 +183,77 @@ python experiments/run_rule_based_baseline.py --scenario congestion --duration 3
 Results are saved as `results/rule_based_<scenario>.json` for direct comparison
 with the fixed-time JSON files.
 
+## Classical optimization SUMO baseline
+
+The classical controller measures the current North/South and East/West state
+every 10 seconds and enumerates all 49 combinations of green times from
+`20, 25, 30, 35, 40, 45, 50` seconds. It selects the minimum-cost pair using:
+
+`10*queue + 2*waiting + 100*density - 4*flow*green_share`
+
+The selected timing is sent to SUMO, and every candidate cost plus the selected
+solution is saved in the result JSON for later QUBO/QAOA comparison:
+
+```bash
+python experiments/run_classical_optimizer.py --scenario normal --duration 3600
+python experiments/run_classical_optimizer.py --scenario rush --duration 3600
+python experiments/run_classical_optimizer.py --scenario congestion --duration 3600
+```
+
+Results are saved as `results/classical_optimizer_<scenario>.json` and contain
+the same waiting, queue, travel-time, throughput, fuel, and CO2 metrics as the
+two baseline controllers.
+
+## Dynamic QUBO generation
+
+The QUBO builder is in `src/optimization/qubo_builder.py`. It creates binary
+variables such as `x_NS_20` and `x_EW_40`, where one variable per phase must be
+selected. The QUBO includes one-hot penalties, candidate min/max timing domains,
+5-second yellow transitions, and a practical 120-second cycle compatibility
+penalty. The linear and quadratic objective coefficients are regenerated from
+each traffic-state snapshot, so different SUMO states produce different QUBOs.
+
+The objective terms use the same normalized weights as the classical optimizer;
+emergency-priority mode replaces them with the documented emergency weights.
+Minimum green timing is also the pedestrian/signal-safety lower bound. Emergency
+delay is included in the state-dependent objective, so an active emergency
+changes the QUBO rather than requiring a separate optimizer.
+
+Build a QUBO artifact from a current state snapshot:
+
+```bash
+python experiments/build_dynamic_qubo.py \
+      --state data/example_traffic_state.json \
+      --output results/dynamic_qubo.json
+```
+
+The saved JSON contains variables, linear coefficients, quadratic coefficients,
+penalty metadata, normalization bounds, weights, and the traffic state used to
+create that QUBO. A future QAOA solver can consume `linear`, `quadratic`, and
+`offset`, then decode its bitstring with `DynamicQUBOBuilder.decode()`.
+
+The normalized objective is:
+
+`w1*waiting + w2*queue + w3*congestion + w4*emergency_delay + w5*fuel + w6*co2 - w7*throughput`
+
+The documented baseline weights are waiting `.25`, queue `.20`, congestion
+`.15`, emergency delay `.15`, fuel `.10`, CO2 `.10`, and throughput `.05`.
+Emergency-priority mode changes them to `.18`, `.14`, `.10`, `.35`, `.08`,
+`.08`, and `.07` respectively. Metrics are normalized using explicit reference
+limits stored in every result file, so units do not determine importance.
+
+Run the weight-sensitivity experiment:
+
+```bash
+python experiments/weight_sensitivity.py --output results/weight_sensitivity.json
+```
+
+To run a SUMO experiment with emergency-priority weights:
+
+```bash
+python experiments/run_classical_optimizer.py --scenario normal --emergency-priority
+```
+
 ## Next steps
 
 Milestone 6: QUBO →
