@@ -10,6 +10,7 @@ from statistics import mean
 from typing import Dict, List
 
 from config import settings
+from src.metrics.environment_estimation import EnvironmentalEstimator
 
 
 class MetricsCollector:
@@ -59,6 +60,17 @@ class MetricsCollector:
         n_appr = max(1, len([1 for _ in self.total_queue]))
 
         emg = self.emergency_records
+        estimate = EnvironmentalEstimator.estimate_scenario([
+            {
+                "distance_m": float(getattr(v, "distance_m", 0.0)),
+                "avg_speed_kmh": float(getattr(v, "speed_kmh", 0.0)),
+                "idle_time_s": float(getattr(v, "waiting_time", 0.0)),
+                "stop_count": int(getattr(v, "stops", 0)),
+                "acceleration_events": int(getattr(v, "acceleration_events", 0)),
+                "fuel_factor": float(getattr(v, "fuel_factor", 1.0)),
+            }
+            for v in all_v
+        ])
         return {
             "duration_s": duration,
             "vehicles_completed": len(self.completed),
@@ -71,8 +83,10 @@ class MetricsCollector:
             "congestion_index": round(mean(self.mean_density) if self.mean_density else 0, 3),
             "throughput_veh": len(self.completed),
             "throughput_vph": round(len(self.completed) * 3600.0 / max(duration, 1), 1),
-            "fuel_litres": round(fuel, 3),
-            "co2_kg": round(fuel * settings.CO2_G_PER_LITRE / 1000.0, 3),
+            "fuel_litres": round(estimate["fuel_litres"], 3),
+            "co2_kg": round(estimate["co2_kg"], 3),
+            "estimated_fuel_litres": round(estimate["estimated_fuel_litres"], 3),
+            "estimated_co2_kg": round(estimate["estimated_co2_kg"], 3),
             "emergency_travel_time_s": round(mean([e["travel_time_s"] for e in emg]), 1) if emg else None,
             "emergency_waiting_time_s": round(mean([e["waiting_time_s"] for e in emg]), 1) if emg else None,
         }
@@ -90,8 +104,8 @@ class MetricsCollector:
             ("Max total queue (veh)", s["max_total_queue"]),
             ("Congestion index", s["congestion_index"]),
             ("Throughput (veh/h)", s["throughput_vph"]),
-            ("Fuel (litres)", s["fuel_litres"]),
-            ("CO2 (kg)", s["co2_kg"]),
+            ("Estimated fuel (litres)", s["estimated_fuel_litres"]),
+            ("Estimated CO2 (kg)", s["estimated_co2_kg"]),
             ("Emergency travel time (s)", s["emergency_travel_time_s"]),
         ]
         for label, value in rows:
