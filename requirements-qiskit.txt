@@ -1,0 +1,5 @@
+# Optional quantum backend for the existing NumPy QAOA implementation.
+qiskit>=1.0
+qiskit-aer>=0.13
+qiskit-optimization>=0.6
+qiskit-algorithms>=0.3

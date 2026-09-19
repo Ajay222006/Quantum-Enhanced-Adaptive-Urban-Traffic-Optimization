@@ -1,0 +1,1309 @@
+{
+  "controller": "realtime_qubo_hybrid",
+  "duration_s": 125.0,
+  "optimization_interval_s": 30,
+  "prediction_enabled": false,
+  "emergency_priority": false,
+  "optimization_steps": 6,
+  "final_plan": {
+    "NS": 50,
+    "EW": 20
+  },
+  "events": [
+    "[61s] ACCIDENT injected on west_in: capacity 25%",
+    "[91s] INCIDENT CLEARED on west_in: capacity restored"
+  ],
+  "optimization_log": [
+    {
+      "time": 0.0,
+      "trigger": "scheduled",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.0,
+            "queue": 0,
+            "avg_speed": 0.0,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [],
+            "vehicle_details": []
+          },
+          "S": {
+            "density": 0.0,
+            "queue": 0,
+            "avg_speed": 0.0,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [],
+            "vehicle_details": []
+          },
+          "E": {
+            "density": 0.0,
+            "queue": 0,
+            "avg_speed": 0.0,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [],
+            "vehicle_details": []
+          },
+          "W": {
+            "density": 0.0,
+            "queue": 0,
+            "avg_speed": 0.0,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [],
+            "vehicle_details": []
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 20.0
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.0
+      },
+      "solution": {
+        "NS": 50,
+        "EW": 20
+      },
+      "energy": 0.0
+    },
+    {
+      "time": 30.0,
+      "trigger": "scheduled",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.04,
+            "queue": 0,
+            "avg_speed": 13.79,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_ns.2",
+              "normal_ns.3"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ns.2",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 156.75,
+                "speed": 14.0,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.3",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 44.78,
+                "speed": 13.59,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "S": {
+            "density": 0.04,
+            "queue": 0,
+            "avg_speed": 13.52,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_sn.2",
+              "normal_sn.3"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_sn.2",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 176.99,
+                "speed": 14.41,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.3",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 42.72,
+                "speed": 12.62,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "E": {
+            "density": 0.08,
+            "queue": 2,
+            "avg_speed": 6.55,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_ew.0",
+              "normal_ew.1",
+              "normal_ew.2",
+              "normal_ew.3"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ew.0",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 11.0
+              },
+              {
+                "id": "normal_ew.1",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 184.3,
+                "speed": 0.0,
+                "waiting_time": 3.0
+              },
+              {
+                "id": "normal_ew.2",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 151.06,
+                "speed": 10.67,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.3",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 63.01,
+                "speed": 15.53,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "W": {
+            "density": 0.1,
+            "queue": 2,
+            "avg_speed": 5.53,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_we.0",
+              "normal_we.1",
+              "normal_we.2",
+              "normal_we.3",
+              "normal_we.4"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_we.0",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 12.0
+              },
+              {
+                "id": "normal_we.1",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 184.3,
+                "speed": 0.0,
+                "waiting_time": 4.0
+              },
+              {
+                "id": "normal_we.2",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 172.21,
+                "speed": 8.7,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.3",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 91.43,
+                "speed": 13.42,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.4",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 5.1,
+                "speed": 5.53,
+                "waiting_time": 0.0
+              }
+            ]
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 19.9701
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.086508116883095
+      },
+      "solution": {
+        "NS": 20,
+        "EW": 50
+      },
+      "energy": 0.02093749999999872
+    },
+    {
+      "time": 60.0,
+      "trigger": "scheduled",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.04,
+            "queue": 0,
+            "avg_speed": 11.07,
+            "flow": 6.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ns.5",
+              "normal_ns.6"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ns.5",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 188.84,
+                "speed": 7.0,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.6",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 107.95,
+                "speed": 15.14,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "S": {
+            "density": 0.06,
+            "queue": 0,
+            "avg_speed": 6.48,
+            "flow": 6.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_sn.5",
+              "normal_sn.6",
+              "normal_sn.7"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_sn.5",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 191.64,
+                "speed": 0.93,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.6",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 103.18,
+                "speed": 12.04,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.7",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 5.1,
+                "speed": 6.48,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "E": {
+            "density": 0.12,
+            "queue": 1,
+            "avg_speed": 4.4,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ew.2",
+              "normal_ew.3",
+              "normal_ew.4",
+              "normal_ew.5",
+              "normal_ew.6",
+              "normal_ew.7"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ew.2",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 182.68,
+                "speed": 3.57,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.3",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 171.57,
+                "speed": 1.59,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.4",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 162.45,
+                "speed": 0.66,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.5",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 154.29,
+                "speed": 0.02,
+                "waiting_time": 3.0
+              },
+              {
+                "id": "normal_ew.6",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 116.84,
+                "speed": 12.09,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.7",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 23.56,
+                "speed": 8.45,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "W": {
+            "density": 0.14,
+            "queue": 1,
+            "avg_speed": 3.99,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_we.2",
+              "normal_we.3",
+              "normal_we.4",
+              "normal_we.5",
+              "normal_we.6",
+              "normal_we.7",
+              "normal_we.8"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_we.2",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 184.33,
+                "speed": 4.32,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.3",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 172.16,
+                "speed": 1.93,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.4",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 162.46,
+                "speed": 0.66,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.5",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 154.29,
+                "speed": 0.0,
+                "waiting_time": 8.0
+              },
+              {
+                "id": "normal_we.6",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 146.37,
+                "speed": 2.24,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.7",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 82.16,
+                "speed": 12.66,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.8",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 11.19,
+                "speed": 6.09,
+                "waiting_time": 0.0
+              }
+            ]
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 19.9799
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.0574659090909
+      },
+      "solution": {
+        "NS": 20,
+        "EW": 50
+      },
+      "energy": 0.013875000000000526
+    },
+    {
+      "time": 61.0,
+      "trigger": "incident",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.06,
+            "queue": 0,
+            "avg_speed": 8.94,
+            "flow": 6.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ns.5",
+              "normal_ns.6",
+              "normal_ns.7"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ns.5",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 191.35,
+                "speed": 2.5,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.6",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 123.32,
+                "speed": 15.37,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.7",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 5.1,
+                "speed": 8.94,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "S": {
+            "density": 0.06,
+            "queue": 1,
+            "avg_speed": 7.15,
+            "flow": 6.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_sn.5",
+              "normal_sn.6",
+              "normal_sn.7"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_sn.5",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 191.79,
+                "speed": 0.15,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.6",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 115.53,
+                "speed": 12.34,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.7",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 14.05,
+                "speed": 8.95,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "E": {
+            "density": 0.12,
+            "queue": 0,
+            "avg_speed": 5.12,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ew.2",
+              "normal_ew.3",
+              "normal_ew.4",
+              "normal_ew.5",
+              "normal_ew.6",
+              "normal_ew.7"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ew.2",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 188.17,
+                "speed": 5.48,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.3",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 173.89,
+                "speed": 2.31,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.4",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 163.73,
+                "speed": 1.27,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.5",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 154.91,
+                "speed": 0.63,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.6",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 127.67,
+                "speed": 10.82,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.7",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 33.76,
+                "speed": 10.2,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "W": {
+            "density": 0.14,
+            "queue": 2,
+            "avg_speed": 4.38,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_we.2",
+              "normal_we.3",
+              "normal_we.4",
+              "normal_we.5",
+              "normal_we.6",
+              "normal_we.7",
+              "normal_we.8"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_we.2",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 189.03,
+                "speed": 4.7,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.3",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 175.73,
+                "speed": 3.57,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.4",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 164.26,
+                "speed": 1.8,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.5",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 154.67,
+                "speed": 0.37,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.6",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 146.6,
+                "speed": 0.24,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.7",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 93.84,
+                "speed": 11.69,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.8",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 19.48,
+                "speed": 8.29,
+                "waiting_time": 0.0
+              }
+            ]
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 19.9833
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.04758603896103
+      },
+      "solution": {
+        "NS": 20,
+        "EW": 50
+      },
+      "energy": 0.013062500000000199
+    },
+    {
+      "time": 91.0,
+      "trigger": "incident",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.12,
+            "queue": 4,
+            "avg_speed": 3.77,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ns.10",
+              "normal_ns.5",
+              "normal_ns.6",
+              "normal_ns.7",
+              "normal_ns.8",
+              "normal_ns.9"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ns.10",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 34.24,
+                "speed": 9.61,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.5",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 28.0
+              },
+              {
+                "id": "normal_ns.6",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 184.3,
+                "speed": 0.0,
+                "waiting_time": 22.0
+              },
+              {
+                "id": "normal_ns.7",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 176.8,
+                "speed": 0.0,
+                "waiting_time": 15.0
+              },
+              {
+                "id": "normal_ns.8",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 169.3,
+                "speed": 0.0,
+                "waiting_time": 4.0
+              },
+              {
+                "id": "normal_ns.9",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 146.23,
+                "speed": 13.03,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "S": {
+            "density": 0.12,
+            "queue": 4,
+            "avg_speed": 3.79,
+            "flow": 0.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_sn.10",
+              "normal_sn.5",
+              "normal_sn.6",
+              "normal_sn.7",
+              "normal_sn.8",
+              "normal_sn.9"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_sn.10",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 64.1,
+                "speed": 13.4,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.5",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 30.0
+              },
+              {
+                "id": "normal_sn.6",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 184.3,
+                "speed": 0.0,
+                "waiting_time": 23.0
+              },
+              {
+                "id": "normal_sn.7",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 176.8,
+                "speed": 0.0,
+                "waiting_time": 15.0
+              },
+              {
+                "id": "normal_sn.8",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 169.3,
+                "speed": 0.0,
+                "waiting_time": 7.0
+              },
+              {
+                "id": "normal_sn.9",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 154.5,
+                "speed": 9.36,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "E": {
+            "density": 0.04,
+            "queue": 0,
+            "avg_speed": 13.87,
+            "flow": 16.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_ew.10",
+              "normal_ew.11"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ew.10",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 149.13,
+                "speed": 14.74,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.11",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 31.05,
+                "speed": 13.0,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "W": {
+            "density": 0.12,
+            "queue": 0,
+            "avg_speed": 2.73,
+            "flow": 10.0,
+            "capacity": 50,
+            "signal": "rrrrGGggrrrrGGgg",
+            "phase": "2",
+            "vehicles": [
+              "normal_we.10",
+              "normal_we.11",
+              "normal_we.12",
+              "normal_we.7",
+              "normal_we.8",
+              "normal_we.9"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_we.10",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 64.24,
+                "speed": 2.15,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.11",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 29.96,
+                "speed": 2.25,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.12",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 14.38,
+                "speed": 2.84,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.7",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 174.18,
+                "speed": 3.08,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.8",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 122.26,
+                "speed": 3.38,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.9",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 74.53,
+                "speed": 2.66,
+                "waiting_time": 0.0
+              }
+            ]
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 19.9056
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.27308766233766
+      },
+      "solution": {
+        "NS": 50,
+        "EW": 20
+      },
+      "energy": 0.06349999999999945
+    },
+    {
+      "time": 121.0,
+      "trigger": "scheduled",
+      "current_state": {
+        "C": {
+          "N": {
+            "density": 0.16,
+            "queue": 3,
+            "avg_speed": 3.11,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_ns.10",
+              "normal_ns.11",
+              "normal_ns.12",
+              "normal_ns.13",
+              "normal_ns.14",
+              "normal_ns.7",
+              "normal_ns.8",
+              "normal_ns.9"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ns.10",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 154.29,
+                "speed": 0.0,
+                "waiting_time": 18.0
+              },
+              {
+                "id": "normal_ns.11",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 146.79,
+                "speed": 0.0,
+                "waiting_time": 8.0
+              },
+              {
+                "id": "normal_ns.12",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 139.29,
+                "speed": 0.01,
+                "waiting_time": 2.0
+              },
+              {
+                "id": "normal_ns.13",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 88.98,
+                "speed": 14.11,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.14",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 5.1,
+                "speed": 3.11,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.7",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 185.83,
+                "speed": 3.97,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.8",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 173.6,
+                "speed": 2.55,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ns.9",
+                "road_id": "north_in",
+                "lane_id": "north_in_0",
+                "position": 162.96,
+                "speed": 1.17,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "S": {
+            "density": 0.16,
+            "queue": 3,
+            "avg_speed": 2.84,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_sn.10",
+              "normal_sn.11",
+              "normal_sn.12",
+              "normal_sn.13",
+              "normal_sn.14",
+              "normal_sn.7",
+              "normal_sn.8",
+              "normal_sn.9"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_sn.10",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 154.29,
+                "speed": 0.0,
+                "waiting_time": 19.0
+              },
+              {
+                "id": "normal_sn.11",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 146.79,
+                "speed": 0.0,
+                "waiting_time": 11.0
+              },
+              {
+                "id": "normal_sn.12",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 139.29,
+                "speed": 0.0,
+                "waiting_time": 4.0
+              },
+              {
+                "id": "normal_sn.13",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 116.25,
+                "speed": 11.45,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.14",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 14.06,
+                "speed": 5.32,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.7",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 183.14,
+                "speed": 3.44,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.8",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 172.13,
+                "speed": 1.85,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_sn.9",
+                "road_id": "south_in",
+                "lane_id": "south_in_0",
+                "position": 162.44,
+                "speed": 0.64,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "E": {
+            "density": 0.08,
+            "queue": 2,
+            "avg_speed": 5.04,
+            "flow": 4.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_ew.12",
+              "normal_ew.13",
+              "normal_ew.14",
+              "normal_ew.15"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_ew.12",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 5.0
+              },
+              {
+                "id": "normal_ew.13",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 184.29,
+                "speed": 0.04,
+                "waiting_time": 1.0
+              },
+              {
+                "id": "normal_ew.14",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 125.56,
+                "speed": 15.08,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_ew.15",
+                "road_id": "east_in",
+                "lane_id": "east_in_0",
+                "position": 5.1,
+                "speed": 5.04,
+                "waiting_time": 0.0
+              }
+            ]
+          },
+          "W": {
+            "density": 0.06,
+            "queue": 1,
+            "avg_speed": 8.95,
+            "flow": 14.0,
+            "capacity": 50,
+            "signal": "GGggrrrrGGggrrrr",
+            "phase": "0",
+            "vehicles": [
+              "normal_we.14",
+              "normal_we.15",
+              "normal_we.16"
+            ],
+            "vehicle_details": [
+              {
+                "id": "normal_we.14",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 191.8,
+                "speed": 0.0,
+                "waiting_time": 5.0
+              },
+              {
+                "id": "normal_we.15",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 166.09,
+                "speed": 13.81,
+                "waiting_time": 0.0
+              },
+              {
+                "id": "normal_we.16",
+                "road_id": "west_in",
+                "lane_id": "west_in_0",
+                "position": 51.5,
+                "speed": 13.04,
+                "waiting_time": 0.0
+              }
+            ]
+          }
+        }
+      },
+      "predicted_state": {},
+      "qubo": {
+        "variables": 8,
+        "linear_terms": 8,
+        "quadratic_terms": 28,
+        "offset": 19.9372
+      },
+      "ising": {
+        "fields": 8,
+        "couplings": 28,
+        "constant": 40.181262987012985
+      },
+      "solution": {
+        "NS": 50,
+        "EW": 20
+      },
+      "energy": 0.04737500000000061
+    }
+  ]
+}
