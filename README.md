@@ -119,8 +119,71 @@ Each one subclasses `BaseController` and is added to `CONTROLLERS` in
 - Emergency green corridor: ETA-based preemption of current + next intersection, queue jump, restoration
 - Metrics: waiting time, travel time, queue, congestion index, throughput, fuel, CO₂, emergency travel time
 - `sim.snapshot()` returns a ready-to-render frame for the Streamlit dashboard
+- SUMO live estimator: vehicle details, approach density, queue, average speed, crossing flow, capacity, and signal phase
+- XGBoost traffic prediction: chronological train/validation/test workflow with MAE, RMSE, and R² metrics
+
+## Traffic prediction workflow
+
+Collect a time series from SUMO at five-second intervals. Run this once for each
+traffic condition and use a different `--scenario` label for each dataset:
+
+```bash
+python sumo/collect_traffic_dataset.py --scenario normal --output data/normal.csv
+python sumo/collect_traffic_dataset.py --scenario rush --output data/rush.csv
+python sumo/collect_traffic_dataset.py --scenario road_closure --output data/closure.csv
+```
+
+Train a 30-second predictor from a 30-second history window:
+
+```bash
+python experiments/train_traffic_predictor.py \
+      --data data/normal.csv \
+      --model models/traffic_predictor.joblib \
+      --interval 5 --history 30 --horizon 30
+```
+
+The trained artifact is loaded by `RealTimeTrafficPredictor`. During a TraCI
+loop, call `predictor.update(estimator.update(), simulation_time)` after each
+estimator snapshot. Its output contains predicted density, queue, and flow for
+each intersection approach and is ready to be combined with current state by a
+future QUBO/QAOA controller.
+
+## Fixed-time SUMO baseline
+
+The fixed-time controller uses an unchanged 70-second cycle:
+`30 seconds green NS, 5 seconds yellow, 30 seconds green EW, 5 seconds yellow`.
+It deliberately does not read traffic density or queue length when choosing the
+phase. Run one clean demand condition at a time:
+
+```bash
+python experiments/run_fixed_time_baseline.py --scenario normal --duration 3600
+python experiments/run_fixed_time_baseline.py --scenario rush --duration 3600
+python experiments/run_fixed_time_baseline.py --scenario congestion --duration 3600
+```
+
+Results are saved as `results/fixed_time_<scenario>.json` and include waiting
+time, queue length, travel time, throughput, fuel, and CO2. The scenario runner
+filters `routes.rou.xml` so the baseline does not accidentally combine all
+traffic patterns in one experiment.
+
+## Rule-based SUMO baseline
+
+The queue-responsive controller measures the North/South and East/West incoming
+queues every 10 seconds. It increases the relevant green by 5 seconds above 15
+queued vehicles, decreases it below 5 vehicles, and clamps every green between
+20 and 60 seconds. It uses the same scenarios and metrics as the fixed-time
+baseline:
+
+```bash
+python experiments/run_rule_based_baseline.py --scenario normal --duration 3600
+python experiments/run_rule_based_baseline.py --scenario rush --duration 3600
+python experiments/run_rule_based_baseline.py --scenario congestion --duration 3600
+```
+
+Results are saved as `results/rule_based_<scenario>.json` for direct comparison
+with the fixed-time JSON files.
 
 ## Next steps
 
-Milestone 5: short-term prediction (XGBoost) → Milestone 6: QUBO →
+Milestone 6: QUBO →
 Milestone 7: classical optimizer → Milestone 8: QAOA → Milestone 12: dashboard.

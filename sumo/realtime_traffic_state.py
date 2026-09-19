@@ -54,6 +54,7 @@ class SumoTrafficStateEstimator:
         self.default_vehicle_length_m = default_vehicle_length_m
 
         self._flow_history: Dict[Tuple[str, str], collections.deque] = {}
+        self._previous_vehicles: Dict[Tuple[str, str], set] = {}
         self._last_step_time = None
 
     def _ensure_history(self, intersection_id: str, direction: str):
@@ -121,22 +122,25 @@ class SumoTrafficStateEstimator:
 
         return vehicles
 
-    def _flow_for_direction(self, intersection_id: str, direction: str, vehicle_ids: List[str]) -> float:
-        """Estimate flow as vehicles/minute for the last flow window."""
+    def _flow_for_direction(self, intersection_id: str, direction: str,
+                            vehicle_ids: List[str]) -> float:
+        """Count vehicles leaving an approach and convert the window to veh/min."""
         current_time = traci.simulation.getTime() if traci is not None else time.time()
         self._ensure_history(intersection_id, direction)
         history = self._flow_history[(intersection_id, direction)]
 
-        history.append((current_time, len(vehicle_ids)))
+        key = (intersection_id, direction)
+        current_vehicles = set(vehicle_ids)
+        previous_vehicles = self._previous_vehicles.get(key, set())
+        crossed = len(previous_vehicles - current_vehicles) if previous_vehicles else 0
+        self._previous_vehicles[key] = current_vehicles
+        history.append((current_time, crossed))
         while history and current_time - history[0][0] > self.flow_window_seconds:
             history.popleft()
 
-        if len(history) < 2:
-            return float(len(vehicle_ids))
-
-        window_seconds = max(1.0, current_time - history[0][0])
-        vehicles_in_window = sum(count for _, count in history)
-        return (vehicles_in_window / window_seconds) * 60.0
+        window_seconds = max(self.flow_window_seconds, 1.0)
+        vehicles_crossed = sum(count for _, count in history)
+        return (vehicles_crossed / window_seconds) * 60.0
 
     def update(self) -> Dict[str, Dict[str, Dict[str, float]]]:
         """Collect the live traffic state for all intersections and directions."""
@@ -154,9 +158,18 @@ class SumoTrafficStateEstimator:
 
                 speeds = []
                 queue_count = 0
+                vehicle_details = []
                 for vehicle_id in vehicles:
                     try:
                         speed = float(traci.vehicle.getSpeed(vehicle_id))
+                        vehicle_details.append({
+                            "id": vehicle_id,
+                            "road_id": traci.vehicle.getRoadID(vehicle_id),
+                            "lane_id": traci.vehicle.getLaneID(vehicle_id),
+                            "position": round(float(traci.vehicle.getLanePosition(vehicle_id)), 2),
+                            "speed": round(speed, 2),
+                            "waiting_time": round(float(traci.vehicle.getWaitingTime(vehicle_id)), 2),
+                        })
                     except Exception:
                         speed = 0.0
                     speeds.append(speed)
@@ -181,6 +194,7 @@ class SumoTrafficStateEstimator:
                     "signal": signal_info["state"],
                     "phase": signal_info["phase"],
                     "vehicles": vehicles,
+                    "vehicle_details": vehicle_details,
                 }
 
         return result
