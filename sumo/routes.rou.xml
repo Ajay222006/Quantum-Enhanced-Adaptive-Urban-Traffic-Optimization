@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5" minGap="2.5" maxSpeed="50" color="0,1,0"/>
+    <vType id="bus" accel="1.8" decel="4.0" sigma="0.5" length="12" minGap="3.0" maxSpeed="30" color="1,0,0"/>
+    <vType id="truck" accel="1.5" decel="3.5" sigma="0.5" length="8" minGap="2.0" maxSpeed="25" color="0,0,1"/>
+    <vType id="motorcycle" accel="3.5" decel="5.0" sigma="0.5" length="2.2" minGap="1.2" maxSpeed="40" color="1,1,0"/>
+
+    <route id="r_we" edges="west_in east_out"/>
+    <route id="r_ew" edges="east_in west_out"/>
+    <route id="r_ns" edges="north_in south_out"/>
+    <route id="r_sn" edges="south_in north_out"/>
+
+    <!-- Low traffic -->
+    <flow id="low_we" type="car" route="r_we" begin="0" end="3600" probability="0.02"/>
+    <flow id="low_ew" type="car" route="r_ew" begin="0" end="3600" probability="0.02"/>
+    <flow id="low_ns" type="car" route="r_ns" begin="0" end="3600" probability="0.02"/>
+    <flow id="low_sn" type="car" route="r_sn" begin="0" end="3600" probability="0.02"/>
+
+    <!-- Normal traffic -->
+    <flow id="normal_we" type="car" route="r_we" begin="0" end="3600" vehsPerHour="500"/>
+    <flow id="normal_ew" type="car" route="r_ew" begin="0" end="3600" vehsPerHour="450"/>
+    <flow id="normal_ns" type="car" route="r_ns" begin="0" end="3600" vehsPerHour="420"/>
+    <flow id="normal_sn" type="car" route="r_sn" begin="0" end="3600" vehsPerHour="430"/>
+
+    <!-- Rush hour -->
+    <flow id="rush_we" type="car" route="r_we" begin="600" end="2700" vehsPerHour="900"/>
+    <flow id="rush_ew" type="car" route="r_ew" begin="600" end="2700" vehsPerHour="850"/>
+    <flow id="rush_ns" type="car" route="r_ns" begin="600" end="2700" vehsPerHour="800"/>
+    <flow id="rush_sn" type="car" route="r_sn" begin="600" end="2700" vehsPerHour="820"/>
+
+    <!-- Sudden increase bursts -->
+    <flow id="burst_we_1" type="car" route="r_we" begin="600" end="900" vehsPerHour="1800"/>
+    <flow id="burst_ew_1" type="car" route="r_ew" begin="600" end="900" vehsPerHour="1700"/>
+    <flow id="burst_ns_1" type="car" route="r_ns" begin="600" end="900" vehsPerHour="1700"/>
+    <flow id="burst_sn_1" type="car" route="r_sn" begin="600" end="900" vehsPerHour="1600"/>
+
+    <flow id="burst_we_2" type="car" route="r_we" begin="1200" end="1500" vehsPerHour="2000"/>
+    <flow id="burst_ew_2" type="car" route="r_ew" begin="1200" end="1500" vehsPerHour="1900"/>
+    <flow id="burst_ns_2" type="car" route="r_ns" begin="1200" end="1500" vehsPerHour="1900"/>
+    <flow id="burst_sn_2" type="car" route="r_sn" begin="1200" end="1500" vehsPerHour="1850"/>
+
+    <!-- Buses / trucks / bikes -->
+    <flow id="bus_we" type="bus" route="r_we" begin="300" end="2700" period="900"/>
+    <flow id="truck_ns" type="truck" route="r_ns" begin="700" end="2500" period="220"/>
+    <flow id="bike_we" type="motorcycle" route="r_we" begin="0" end="3600" probability="0.03"/>
+    <flow id="bike_ew" type="motorcycle" route="r_ew" begin="0" end="3600" probability="0.03"/>
+</routes>

@@ -1,0 +1,306 @@
+{
+  "variables": [
+    "x_NS_20",
+    "x_NS_30",
+    "x_NS_40",
+    "x_NS_50",
+    "x_EW_20",
+    "x_EW_30",
+    "x_EW_40",
+    "x_EW_50"
+  ],
+  "linear": {
+    "x_NS_20": -9.769992,
+    "x_NS_30": -9.790276666666667,
+    "x_NS_40": -9.804765714285715,
+    "x_NS_50": -9.8156325,
+    "x_EW_20": -9.769992,
+    "x_EW_30": -9.76271,
+    "x_EW_40": -9.757508571428572,
+    "x_EW_50": -9.7536075
+  },
+  "quadratic": {
+    "x_NS_20|x_NS_30": 20.0,
+    "x_NS_20|x_NS_40": 20.0,
+    "x_NS_20|x_NS_50": 20.0,
+    "x_NS_30|x_NS_40": 20.0,
+    "x_NS_30|x_NS_50": 20.0,
+    "x_NS_40|x_NS_50": 20.0,
+    "x_EW_20|x_EW_30": 20.0,
+    "x_EW_20|x_EW_40": 20.0,
+    "x_EW_20|x_EW_50": 20.0,
+    "x_EW_30|x_EW_40": 20.0,
+    "x_EW_30|x_EW_50": 20.0,
+    "x_EW_40|x_EW_50": 20.0,
+    "x_EW_20|x_NS_20": 0.0,
+    "x_EW_30|x_NS_20": 0.0,
+    "x_EW_40|x_NS_20": 0.0,
+    "x_EW_50|x_NS_20": 0.0,
+    "x_EW_20|x_NS_30": 0.0,
+    "x_EW_30|x_NS_30": 0.0018575238095237534,
+    "x_EW_40|x_NS_30": 0.003510738095238025,
+    "x_EW_50|x_NS_30": 0.004941055555555546,
+    "x_EW_20|x_NS_40": 0.0,
+    "x_EW_30|x_NS_40": 0.002526214285714201,
+    "x_EW_40|x_NS_40": 0.004953396825396722,
+    "x_EW_50|x_NS_40": 0.00715521428571414,
+    "x_EW_20|x_NS_50": 0.0,
+    "x_EW_30|x_NS_50": 0.0026438333333332897,
+    "x_EW_40|x_NS_50": 0.005383071428571362,
+    "x_EW_50|x_NS_50": 0.007978909090909009
+  },
+  "offset": 19.769992,
+  "metadata": {
+    "encoding": "x(phase,green_time)",
+    "phases": [
+      "NS",
+      "EW"
+    ],
+    "green_times": [
+      20,
+      30,
+      40,
+      50
+    ],
+    "yellow_seconds": 5,
+    "min_green_seconds": 20,
+    "max_green_seconds": 60,
+    "penalty": 10.0,
+    "objective": "normalized weighted multi-objective traffic cost",
+    "weights": {
+      "waiting": 0.18,
+      "queue": 0.14,
+      "congestion": 0.1,
+      "emergency_delay": 0.35,
+      "fuel": 0.08,
+      "co2": 0.08,
+      "throughput": 0.07
+    },
+    "bounds": {
+      "waiting_max": 300.0,
+      "queue_max": 100.0,
+      "congestion_max": 1.0,
+      "emergency_delay_max": 180.0,
+      "fuel_max": 10.0,
+      "co2_max": 25.0,
+      "throughput_max": 100.0
+    },
+    "emergency_active": true,
+    "candidate_costs": {
+      "20|20": {
+        "cost": 0.23000799999999996,
+        "metrics": {
+          "waiting": 99.0,
+          "queue": 28.2,
+          "congestion": 0.612,
+          "emergency_delay": 10.799999999999999,
+          "fuel": 4.55,
+          "co2": 11.440000000000001,
+          "throughput": 34.400000000000006
+        }
+      },
+      "20|30": {
+        "cost": 0.23729,
+        "metrics": {
+          "waiting": 102.50000000000001,
+          "queue": 29.333333333333336,
+          "congestion": 0.63,
+          "emergency_delay": 12.000000000000002,
+          "fuel": 4.520833333333334,
+          "co2": 11.366666666666669,
+          "throughput": 34.5
+        }
+      },
+      "20|40": {
+        "cost": 0.24249142857142858,
+        "metrics": {
+          "waiting": 105.00000000000001,
+          "queue": 30.142857142857142,
+          "congestion": 0.6428571428571428,
+          "emergency_delay": 12.857142857142858,
+          "fuel": 4.5,
+          "co2": 11.314285714285717,
+          "throughput": 34.57142857142857
+        }
+      },
+      "20|50": {
+        "cost": 0.24639250000000004,
+        "metrics": {
+          "waiting": 106.875,
+          "queue": 30.75,
+          "congestion": 0.6525000000000001,
+          "emergency_delay": 13.5,
+          "fuel": 4.484375,
+          "co2": 11.275,
+          "throughput": 34.625
+        }
+      },
+      "30|20": {
+        "cost": 0.20972333333333334,
+        "metrics": {
+          "waiting": 90.0,
+          "queue": 25.5,
+          "congestion": 0.56,
+          "emergency_delay": 9.0,
+          "fuel": 4.520833333333334,
+          "co2": 11.366666666666669,
+          "throughput": 37.166666666666664
+        }
+      },
+      "30|30": {
+        "cost": 0.21886285714285714,
+        "metrics": {
+          "waiting": 94.28571428571428,
+          "queue": 26.857142857142858,
+          "congestion": 0.5828571428571427,
+          "emergency_delay": 10.285714285714285,
+          "fuel": 4.5,
+          "co2": 11.314285714285715,
+          "throughput": 36.85714285714286
+        }
+      },
+      "30|40": {
+        "cost": 0.2257175,
+        "metrics": {
+          "waiting": 97.5,
+          "queue": 27.875,
+          "congestion": 0.6,
+          "emergency_delay": 11.25,
+          "fuel": 4.484375,
+          "co2": 11.275,
+          "throughput": 36.625
+        }
+      },
+      "30|50": {
+        "cost": 0.23104888888888897,
+        "metrics": {
+          "waiting": 100.00000000000001,
+          "queue": 28.666666666666668,
+          "congestion": 0.6133333333333334,
+          "emergency_delay": 12.000000000000002,
+          "fuel": 4.472222222222221,
+          "co2": 11.244444444444445,
+          "throughput": 36.44444444444444
+        }
+      },
+      "40|20": {
+        "cost": 0.19523428571428575,
+        "metrics": {
+          "waiting": 83.57142857142858,
+          "queue": 23.571428571428573,
+          "congestion": 0.5228571428571429,
+          "emergency_delay": 7.714285714285715,
+          "fuel": 4.5,
+          "co2": 11.314285714285715,
+          "throughput": 39.14285714285714
+        }
+      },
+      "40|30": {
+        "cost": 0.2050425,
+        "metrics": {
+          "waiting": 88.125,
+          "queue": 25.0,
+          "congestion": 0.5475,
+          "emergency_delay": 9.0,
+          "fuel": 4.484375,
+          "co2": 11.275,
+          "throughput": 38.625
+        }
+      },
+      "40|40": {
+        "cost": 0.2126711111111111,
+        "metrics": {
+          "waiting": 91.66666666666667,
+          "queue": 26.111111111111114,
+          "congestion": 0.5666666666666667,
+          "emergency_delay": 10.0,
+          "fuel": 4.472222222222221,
+          "co2": 11.244444444444445,
+          "throughput": 38.22222222222222
+        }
+      },
+      "40|50": {
+        "cost": 0.21877399999999997,
+        "metrics": {
+          "waiting": 94.5,
+          "queue": 27.0,
+          "congestion": 0.582,
+          "emergency_delay": 10.799999999999999,
+          "fuel": 4.4624999999999995,
+          "co2": 11.22,
+          "throughput": 37.900000000000006
+        }
+      },
+      "50|20": {
+        "cost": 0.1843675,
+        "metrics": {
+          "waiting": 78.75,
+          "queue": 22.125,
+          "congestion": 0.495,
+          "emergency_delay": 6.75,
+          "fuel": 4.484375,
+          "co2": 11.275,
+          "throughput": 40.625
+        }
+      },
+      "50|30": {
+        "cost": 0.19429333333333332,
+        "metrics": {
+          "waiting": 83.33333333333333,
+          "queue": 23.555555555555557,
+          "congestion": 0.52,
+          "emergency_delay": 8.0,
+          "fuel": 4.472222222222221,
+          "co2": 11.244444444444445,
+          "throughput": 40.0
+        }
+      },
+      "50|40": {
+        "cost": 0.20223399999999997,
+        "metrics": {
+          "waiting": 87.0,
+          "queue": 24.7,
+          "congestion": 0.54,
+          "emergency_delay": 9.0,
+          "fuel": 4.4624999999999995,
+          "co2": 11.22,
+          "throughput": 39.5
+        }
+      },
+      "50|50": {
+        "cost": 0.20873090909090908,
+        "metrics": {
+          "waiting": 90.0,
+          "queue": 25.636363636363633,
+          "congestion": 0.5563636363636363,
+          "emergency_delay": 9.818181818181817,
+          "fuel": 4.454545454545454,
+          "co2": 11.200000000000001,
+          "throughput": 39.090909090909086
+        }
+      }
+    },
+    "dynamic_state": {
+      "NS": {
+        "queue": 35,
+        "density": 0.72,
+        "waiting": 120,
+        "flow": 51,
+        "capacity": 100,
+        "emergency_delay": 18,
+        "fuel": 2.0,
+        "co2": 5.0
+      },
+      "EW": {
+        "queue": 12,
+        "density": 0.3,
+        "waiting": 45,
+        "flow": 35,
+        "capacity": 100,
+        "emergency_delay": 0,
+        "fuel": 1.5,
+        "co2": 3.8
+      }
+    }
+  }
+}

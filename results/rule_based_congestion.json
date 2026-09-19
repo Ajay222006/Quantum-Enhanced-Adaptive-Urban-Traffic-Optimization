@@ -1,0 +1,20 @@
+{
+  "duration_s": 2400.0,
+  "vehicles_departed": 650,
+  "vehicles_completed": 600,
+  "throughput_vph": 900.0,
+  "avg_waiting_time_s": 1.317,
+  "avg_queue_vehicles": 36.016,
+  "max_queue_vehicles": 50,
+  "avg_travel_time_s": 48.502,
+  "fuel_litres": 57.86041,
+  "co2_kg": 178.475353,
+  "controller": "rule_based",
+  "cycle": "adaptive 20-60G-5Y",
+  "control_interval_s": 10,
+  "min_green_s": 20,
+  "max_green_s": 60,
+  "low_queue_threshold": 5,
+  "high_queue_threshold": 15,
+  "adjustment_step_s": 5
+}
