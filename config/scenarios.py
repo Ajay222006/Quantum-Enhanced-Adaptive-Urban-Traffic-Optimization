@@ -17,7 +17,7 @@ def _internal_road(net):
     for rid, r in net.roads.items():
         if not r.is_entry and not r.is_exit:
             return rid
-    return list(net.roads)[0]
+    raise ValueError("Scenario requires a network with at least one internal road")
 
 
 def build_scenario(name: str, net):

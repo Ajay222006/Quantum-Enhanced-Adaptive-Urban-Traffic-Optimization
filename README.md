@@ -1,12 +1,10 @@
-# Quantum-Enhanced Adaptive Urban Traffic Optimization — Stage 1 (Classical Core)
+# Quantum-Enhanced Adaptive Urban Traffic Optimization
 
-This is **Milestones 1–4** of the project: a fully working multi-intersection
-real-time traffic system with **no optimization technique inside yet**.
-Fixed-time and rule-based control, dynamic events, emergency green corridor,
-and all six objective metrics already work — so when QUBO/QAOA is added later,
-you only write **one new controller class**.
-
-Runs on plain Python 3 — **no external packages needed** for this stage.
+This repository contains a multi-intersection traffic system with fixed-time,
+rule-based, classical optimization, and NumPy QAOA-style control paths. It also
+includes SUMO/TraCI integration, real-time state estimation, traffic
+prediction, emergency green-corridor handling, and normalized environmental
+metrics.
 
 ---
 
@@ -42,7 +40,8 @@ quantum_traffic/
 │   └── metrics/
 │       └── metrics.py             # waiting, queue, congestion, throughput, fuel, CO2
 ├── experiments/
-│   └── compare_controllers.py     # the comparison table
+│   ├── compare_controllers.py     # custom simulator comparison table
+│   └── benchmark_optimizers.py   # exact classical vs NumPy QAOA
 └── data/networks/                 # (later) saved SUMO / JSON networks
 ```
 
@@ -60,6 +59,7 @@ python3 run_simulation.py --controller rule_based --scenario accident --verbose
 python3 run_simulation.py --intersections 8 --duration 3600             # scalability
 
 python3 experiments/compare_controllers.py --scenario rush
+python3 experiments/benchmark_optimizers.py
 ```
 
 ## Installation and environment variables
@@ -157,10 +157,17 @@ The current implementation status is explicit:
       the project’s hybrid solver; `QuadraticProgram` and Qiskit Optimization are
       optional and not currently imported.
 
-After installing the Qiskit stack, the next integration step is to add a
-Qiskit backend that converts `QUBOModel` to `QuadraticProgram`, converts it to
-an Ising operator, runs `QAOA` with `AerSimulator`, and returns the same
-assignment/timing result contract as the current NumPy solver.
+Run the reproducible optimizer benchmark from the project root:
+
+```powershell
+python experiments/benchmark_optimizers.py --output results/optimizer_benchmark.json
+```
+
+It evaluates exact classical enumeration and the NumPy QAOA-style solver on
+the same state-specific QUBO and reports execution time, objective value,
+success probability, problem size, and objective gap. The benchmark is small
+by design: the current timing encoding is a correctness and integration test,
+not evidence of quantum advantage.
 
 Sample output (rush hour, 4 intersections, 1800 s):
 
@@ -197,13 +204,16 @@ ever produce an unsafe plan** — including the quantum one.
 
 ## Where the quantum part plugs in
 
-1. `src/optimization/objective.py` — weighted cost from `IntersectionState`
-2. `src/optimization/qubo_builder.py` — state → decision variables `x(i,p,t)` → QUBO matrix
-3. `src/control/classical_opt.py` — solves the same QUBO with brute force / simulated annealing
-4. `src/control/qaoa_controller.py` — QUBO → Ising → QAOA (Qiskit Aer) → best bitstring → green times
+1. `src/control/traffic_objective.py` — normalized weighted traffic cost
+2. `src/optimization/qubo_builder.py` — state → timing variables → QUBO
+3. `sumo/classical_optimizer_controller.py` — exact candidate enumeration in SUMO
+4. `src/optimization/qaoa_solver.py` — QUBO → Ising → NumPy QAOA-style sampling
 
-Each one subclasses `BaseController` and is added to `CONTROLLERS` in
-`run_simulation.py` and `experiments/compare_controllers.py`. Nothing else changes.
+The custom simulator under `src/` is a fast dependency-light model for
+controller comparisons. The `sumo/` modules are the live TraCI path and use
+SUMO’s network, vehicles, signals, and simulation clock. They share objective
+and prediction components but are separate runtime backends; results from one
+backend should not be presented as measurements from the other.
 
 ---
 
@@ -432,5 +442,6 @@ python experiments/run_classical_optimizer.py --scenario normal --emergency-prio
 
 Milestone 6: QUBO →
 Milestone 7: classical optimizer → Milestone 8: QAOA → Milestone 12: dashboard.
-#   q u a n t e x a _ p r o j e c t  
+#   q u a n t e x a _ p r o j e c t 
+ 
  

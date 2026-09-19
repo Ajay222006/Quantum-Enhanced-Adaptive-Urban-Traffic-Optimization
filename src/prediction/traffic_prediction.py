@@ -88,14 +88,15 @@ class TrafficStateDataset:
         if self.history_steps < 1:
             raise ValueError("history_seconds must be at least interval_seconds")
 
-    def _load(self, csv_path: str) -> Dict[Tuple[str, str], List[dict]]:
+    def _load(self, csv_path: str) -> Dict[Tuple[str, str, str], List[dict]]:
         groups = defaultdict(list)
         with open(csv_path, newline="", encoding="utf-8") as handle:
             for row in csv.DictReader(handle):
                 for name in FEATURE_NAMES:
                     row[name] = float(row[name])
                 row["timestamp"] = float(row["timestamp"])
-                groups[(row["intersection_id"], row["direction"])].append(row)
+                key = (str(row.get("scenario", "unknown")), str(row["intersection_id"]), str(row["direction"]))
+                groups[key].append(row)
         for rows in groups.values():
             rows.sort(key=lambda item: item["timestamp"])
         return groups
@@ -143,32 +144,69 @@ class TrafficPredictionTrainer:
 
         models = {}
         metrics = {}
+        candidate_params = [
+            {"max_depth": 3, "learning_rate": 0.05},
+            {"max_depth": 4, "learning_rate": 0.05},
+            {"max_depth": 4, "learning_rate": 0.08},
+        ]
+
         for key in sorted(set(keys)):
             key_mask = np.asarray([item == key for item in keys])
             key_X, key_y = X[key_mask], y[key_mask]
             key_n = len(key_X)
+            if key_n < 5:
+                continue
             key_train_end = max(1, int(key_n * 0.70))
             key_validation_end = max(key_train_end + 1, int(key_n * 0.85))
-            if key_validation_end >= key_n:
+            key_test_end = key_n
+            if key_validation_end >= key_test_end:
                 continue
+
+            best_params = None
+            best_val_rmse = float("inf")
+            for params in candidate_params:
+                model = MultiOutputRegressor(XGBRegressor(
+                    n_estimators=150,
+                    max_depth=params["max_depth"],
+                    learning_rate=params["learning_rate"],
+                    subsample=0.9,
+                    colsample_bytree=0.9,
+                    objective="reg:squarederror",
+                    random_state=self.random_state,
+                    n_jobs=1,
+                ))
+                model.fit(key_X[:key_train_end], key_y[:key_train_end])
+                val_prediction = model.predict(key_X[key_train_end:key_validation_end])
+                val_actual = key_y[key_train_end:key_validation_end]
+                val_rmse = float(np.sqrt(mean_squared_error(val_actual, val_prediction)))
+                if val_rmse < best_val_rmse:
+                    best_val_rmse = val_rmse
+                    best_params = params
+
+            if best_params is None:
+                continue
+
             model = MultiOutputRegressor(XGBRegressor(
                 n_estimators=150,
-                max_depth=4,
-                learning_rate=0.05,
+                max_depth=best_params["max_depth"],
+                learning_rate=best_params["learning_rate"],
                 subsample=0.9,
                 colsample_bytree=0.9,
                 objective="reg:squarederror",
                 random_state=self.random_state,
                 n_jobs=1,
             ))
-            model.fit(key_X[:key_train_end], key_y[:key_train_end])
-            prediction = model.predict(key_X[key_validation_end:])
-            actual = key_y[key_validation_end:]
-            metrics["|".join(key)] = {
-                "mae": float(mean_absolute_error(actual, prediction)),
-                "rmse": float(np.sqrt(mean_squared_error(actual, prediction))),
-                "r2": float(r2_score(actual, prediction, multioutput="uniform_average")),
-                "test_samples": int(len(actual)),
+            train_val_X = np.concatenate([key_X[:key_train_end], key_X[key_train_end:key_validation_end]], axis=0)
+            train_val_y = np.concatenate([key_y[:key_train_end], key_y[key_train_end:key_validation_end]], axis=0)
+            model.fit(train_val_X, train_val_y)
+            test_prediction = model.predict(key_X[key_validation_end:key_test_end])
+            test_actual = key_y[key_validation_end:key_test_end]
+            metrics["|".join(str(v) for v in key)] = {
+                "mae": float(mean_absolute_error(test_actual, test_prediction)),
+                "rmse": float(np.sqrt(mean_squared_error(test_actual, test_prediction))),
+                "r2": float(r2_score(test_actual, test_prediction, multioutput="uniform_average")),
+                "validation_rmse": float(best_val_rmse),
+                "test_samples": int(len(test_actual)),
             }
             models[key] = model
 

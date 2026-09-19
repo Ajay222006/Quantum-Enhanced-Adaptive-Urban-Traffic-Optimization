@@ -69,14 +69,14 @@ class SumoTrafficStateEstimator:
 
         try:
             lanes = traci.edge.getLanes(edge_id)
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             return 50
 
         capacity = 0
         for lane in lanes:
             try:
                 lane_length = traci.lane.getLength(lane)
-            except Exception:
+            except (AttributeError, TypeError, ValueError):
                 lane_length = 100.0
             capacity += max(1, int(lane_length / self.default_vehicle_length_m))
 
@@ -97,7 +97,7 @@ class SumoTrafficStateEstimator:
                 "phase": str(phase_index),
                 "state": str(state),
             }
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             return {"phase": "UNKNOWN", "state": "UNKNOWN"}
 
     def _approach_vehicles(self, intersection_id: str, direction: str) -> List[str]:
@@ -112,7 +112,7 @@ class SumoTrafficStateEstimator:
         for vehicle_id in traci.vehicle.getIDList():
             try:
                 road_id = traci.vehicle.getRoadID(vehicle_id)
-            except Exception:
+            except (AttributeError, TypeError, ValueError):
                 continue
 
             if any(road_id == edge or road_id.startswith(edge) for edge in approach_edges):
@@ -170,7 +170,7 @@ class SumoTrafficStateEstimator:
                             "speed": round(speed, 2),
                             "waiting_time": round(float(traci.vehicle.getWaitingTime(vehicle_id)), 2),
                         })
-                    except Exception:
+                    except (AttributeError, TypeError, ValueError):
                         speed = 0.0
                     speeds.append(speed)
                     if speed < self.queue_speed_threshold:

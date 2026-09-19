@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import time
 from typing import Dict, Tuple
 
 import numpy as np
@@ -12,20 +13,21 @@ from src.optimization.ising import IsingModel
 
 
 class QAOASolver:
-    """Run a small p-layer QAOA simulation and return a valid best candidate.
+    """Run a classical-optimized QAOA-style ansatz on the timing QUBO.
 
-    This NumPy backend keeps the project runnable without Qiskit. It implements
-    the standard cost phase and X-mixer statevector operations. A future Qiskit
-    backend can use the same IsingModel and result contract.
+    The optimizer searches over QAOA parameters (gamma and beta) using a simple
+    classical optimizer, then samples the prepared state. This keeps the code
+    runnable without Qiskit while still following the expected hybrid workflow.
     """
 
     def __init__(self, builder, layers: int = 1, grid_size: int = 5,
-                 shots: int = 512, seed: int = 42):
+                 shots: int = 512, seed: int = 42, optimizer_steps: int = 40):
         self.builder = builder
         self.layers = layers
         self.grid_size = grid_size
         self.shots = shots
         self.rng = np.random.default_rng(seed)
+        self.optimizer_steps = optimizer_steps
 
     @staticmethod
     def _bits(index: int, count: int) -> Tuple[int, ...]:
@@ -65,41 +67,78 @@ class QAOASolver:
             state = self._apply_mixer(state, beta, count)
         return state
 
+    def _optimize_parameters(self, energies: np.ndarray) -> Tuple[Tuple[float, ...], Tuple[float, ...], float]:
+        """Classically optimize QAOA parameters using a small random-search loop."""
+        best_score = float("inf")
+        best_gammas = tuple(0.0 for _ in range(self.layers))
+        best_betas = tuple(0.0 for _ in range(self.layers))
+
+        coarse_gamma = np.linspace(0.0, math.pi, self.grid_size)
+        coarse_beta = np.linspace(0.0, math.pi / 2.0, self.grid_size)
+        candidate_gammas = list(itertools.product(coarse_gamma, repeat=self.layers))
+        candidate_betas = list(itertools.product(coarse_beta, repeat=self.layers))
+
+        for gammas in candidate_gammas:
+            for betas in candidate_betas:
+                state = self._statevector(energies, gammas, betas)
+                probs = np.abs(state) ** 2
+                score = float(np.sum(probs * energies))
+                if score < best_score:
+                    best_score = score
+                    best_gammas = tuple(float(value) for value in gammas)
+                    best_betas = tuple(float(value) for value in betas)
+
+        for _ in range(self.optimizer_steps):
+            gammas = tuple(float(self.rng.uniform(0.0, math.pi)) for _ in range(self.layers))
+            betas = tuple(float(self.rng.uniform(0.0, math.pi / 2.0)) for _ in range(self.layers))
+            state = self._statevector(energies, gammas, betas)
+            probs = np.abs(state) ** 2
+            score = float(np.sum(probs * energies))
+            if score < best_score:
+                best_score = score
+                best_gammas = gammas
+                best_betas = betas
+
+        return best_gammas, best_betas, best_score
+
     def solve(self, qubo, ising: IsingModel) -> dict:
+        start = time.perf_counter()
         energies = self._energies(ising)
         count = len(ising.variables)
         best_sample = None
         best_probability = -1.0
         best_valid_energy = float("inf")
         best_valid = None
+        classical_fallback_used = False
 
-        values = np.linspace(0.0, math.pi, self.grid_size)
-        for gammas in itertools.product(values, repeat=self.layers):
-            for betas in itertools.product(values / 2.0, repeat=self.layers):
-                state = self._statevector(energies, gammas, betas)
-                probabilities = np.abs(state) ** 2
-                samples = self.rng.choice(len(probabilities), size=self.shots, p=probabilities / probabilities.sum())
-                for sample in samples:
-                    probability = float(probabilities[sample])
-                    if probability > best_probability:
-                        best_probability = probability
-                        best_sample = int(sample)
-                    assignment = {
-                        variable: self._bits(int(sample), count)[position]
-                        for position, variable in enumerate(ising.variables)
-                    }
-                    try:
-                        self.builder.decode(assignment)
-                    except ValueError:
-                        continue
-                    energy = qubo.value(assignment)
-                    if energy < best_valid_energy:
-                        best_valid_energy = energy
-                        best_valid = assignment
+        gammas, betas, _ = self._optimize_parameters(energies)
+        state = self._statevector(energies, gammas, betas)
+        probabilities = np.abs(state) ** 2
+        probabilities_sum = probabilities.sum()
+        if probabilities_sum <= 0.0:
+            probabilities = np.ones_like(probabilities) / len(probabilities)
+        samples = self.rng.choice(len(probabilities), size=self.shots, p=probabilities / probabilities.sum())
+
+        for sample in samples:
+            probability = float(probabilities[sample])
+            if probability > best_probability:
+                best_probability = probability
+                best_sample = int(sample)
+            assignment = {
+                variable: self._bits(int(sample), count)[position]
+                for position, variable in enumerate(ising.variables)
+            }
+            try:
+                self.builder.decode(assignment)
+            except ValueError:
+                continue
+            energy = qubo.value(assignment)
+            if energy < best_valid_energy:
+                best_valid_energy = energy
+                best_valid = assignment
 
         if best_valid is None:
-            # A valid result is mandatory for traffic control; use exact valid
-            # enumeration only when QAOA samples did not hit the feasible set.
+            classical_fallback_used = True
             for ns_green in self.builder.green_times:
                 for ew_green in self.builder.green_times:
                     assignment = {variable: 0 for variable in qubo.variables}
@@ -110,7 +149,11 @@ class QAOASolver:
                         best_valid_energy = energy
                         best_valid = assignment
 
+        if best_valid is None:
+            raise ValueError("No valid signal assignment could be found for the current QUBO.")
+
         timings = self.builder.decode(best_valid)
+        elapsed = time.perf_counter() - start
         return {
             "backend": "numpy_statevector_qaoa",
             "layers": self.layers,
@@ -119,5 +162,12 @@ class QAOASolver:
             "timings": timings,
             "energy": best_valid_energy,
             "most_probable_sample": best_sample,
-            "most_probable_probability": best_probability,
+            "most_probable_probability": float(best_probability),
+            "execution_time_s": float(elapsed),
+            "objective_value": float(best_valid_energy),
+            "solution_quality": "optimal" if classical_fallback_used else "sampled",
+            "success_probability": float(best_probability),
+            "problem_size": int(len(qubo.variables)),
+            "classical_fallback_used": bool(classical_fallback_used),
+            "optimizer_parameters": {"gammas": list(map(float, gammas)), "betas": list(map(float, betas))},
         }
